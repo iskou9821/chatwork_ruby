@@ -6,7 +6,7 @@ require 'json'
 module ChatworkWrapper
   BASE_URL='https://api.chatwork.com/v1';
 
-  #Chatworの認証を通すためのトークンを取得
+  #Chatwork APIの認証トークンに関する設定
   class Token
     @token
 
@@ -27,6 +27,7 @@ module ChatworkWrapper
     end
   end
 
+  #GETを実行
   def get(endpoint, param, token, &callback)
     client = HTTPClient.new
     begin
