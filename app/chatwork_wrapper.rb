@@ -31,12 +31,20 @@ module ChatworkWrapper
   def get(endpoint, param, token, &callback)
     client = HTTPClient.new
     begin
-      client.get_content "#{BASE_URL}/#{endpoint}", param, token.httpHeader do |json|
-        data = JSON.parse(json)
-        callback.call data
+      url = "#{BASE_URL}/#{endpoint}";
+      client.get_content url, param, token.httpHeader do |json|
+        err = false
+        begin
+          data = JSON.parse(json, :quirks_mode => true)
+        rescue JSON::ParserError => pe
+          puts "  JSON変エラー:#{json}"
+          puts "  文字列をJSONとしてparse出来ませんでした:#{pe}"
+          err = true
+        end
+        callback.call(data) if (!err)
       end
-    rescue HTTPClient::BadResponseError, HTTPClient::TimeoutError => e
-      puts 'ERROR!!!!'
+    rescue => e
+      puts "ERROR!!!!#{e}"
       puts e
     end
   end
