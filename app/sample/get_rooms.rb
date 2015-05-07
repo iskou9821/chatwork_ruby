@@ -1,15 +1,9 @@
 require '../chatwork_wrapper'
+require './get_my_chat'
 
 token = ChatworkWrapper::Token.new('/var/conf/chatwork.yaml')
 
-rooms = nil
-ChatworkWrapper.get('rooms','',token) {|data|
-  puts 'ルームリストを取得'
-  p data
-  rooms = data
-}
-
-mychat = rooms.find { |room| room['name'] == 'マイチャット' }
+mychat = getMyChat token
 
 puts 'マイチャット：'
 p mychat
