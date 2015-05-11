@@ -1,4 +1,4 @@
-require '../chatwork_wrapper'
+require '../../app/chatwork_wrapper'
 
 def getMyChat(token)
   rooms = nil

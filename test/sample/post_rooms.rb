@@ -1,4 +1,4 @@
-require '../chatwork_wrapper'
+require '../../app/chatwork_wrapper'
 require './get_my_chat'
 
 token = ChatworkWrapper::Token.new('/var/conf/chatwork.yaml')

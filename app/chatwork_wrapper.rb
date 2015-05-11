@@ -70,4 +70,34 @@ module ChatworkWrapper
 
   module_function :post
   module_function :get
+
+  class ChatworkRoom
+    def self.get_rooms(token)
+      rooms = {};
+      ChatworkWrapper.get('rooms','',token) {|items|
+        items.each {|item|
+          name = item['name']
+          rooms[name] = item
+        }
+      }
+      return rooms
+    end
+
+    def self.post_message(token, room_name, message)
+      rooms = get_rooms(token)
+      room = rooms[room_name]
+      return nil if (room == nil)
+      return post_message_with_id token, room['room_id'], message
+    end
+
+    def self.post_message_with_id(token, room_id, message)
+      res = nil
+      escaped = URI.escape message
+      param =  "body=#{escaped}"
+      ChatworkWrapper.post("rooms/#{room_id}/messages",param,token) {|data|
+        res = data;
+      }
+      return res;
+    end
+  end
 end
