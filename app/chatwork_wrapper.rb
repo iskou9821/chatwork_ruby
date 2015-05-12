@@ -71,6 +71,16 @@ module ChatworkWrapper
   module_function :post
   module_function :get
 
+  class CharworkUser
+    def self.get_user_info(token)
+      me = nil;
+      ChatworkWrapper.get('me','',token) {|data|
+        me = data
+      }
+      return me
+    end
+  end
+
   class ChatworkRoom
     def self.get_rooms(token)
       rooms = {};
