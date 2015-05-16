@@ -144,6 +144,21 @@ module ChatworkWrapper
       return rooms
     end
 
+    def self.get_room_members(token, room_name)
+      rooms = get_rooms(token)
+      room = rooms[room_name]
+      return nil if (room == nil)
+
+      members = {}
+      ChatworkWrapper.get("rooms/#{room['room_id']}/members",'',token) {|items|
+        items.each {|item|
+          name = item['name']
+          members[name] = item
+        }
+      }
+      return members
+    end
+
     def self.post_message(token, room_name, message)
       rooms = get_rooms(token)
       room = rooms[room_name]
