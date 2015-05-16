@@ -71,15 +71,42 @@ module ChatworkWrapper
   module_function :post
   module_function :get
 
-  class CharworkUser
-    def self.get_user_info(token)
-      me = nil;
+  class ChatworkUser
+    def self.get_info(token)
+      me = nil
       ChatworkWrapper.get('me','',token) {|data|
         me = data
       }
       return me
     end
+
+    def self.get_status(token)
+      sts = nil
+      ChatworkWrapper.get('my/status','',token) {|data|
+        sts = data
+      }
+      return sts
+    end
+
+    def self.get_tasks(token,assigned_by_account_id=nil,status=nil)
+      tasks = nil
+
+      params = ''
+      if (assigned_by_account_id != nil && status != nil)
+        params = "assigned_by_account_id=#{assigned_by_account_id}&status=#{status}"
+      elsif (assigned_by_account_id != nil)
+        params = "assigned_by_account_id=#{assigned_by_account_id}"
+      elsif (status != nil)
+        params = "status=#{status}"
+      end
+
+      ChatworkWrapper.get('my/tasks',params,token) {|data|
+        tasks = data
+      }
+      return tasks
+    end
   end
+
 
   class ChatworkRoom
     def self.get_rooms(token)

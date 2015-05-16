@@ -3,7 +3,7 @@ require '../app/chatwork_wrapper'
 token = ChatworkWrapper::Token.new('/var/conf/chatwork.yaml')
 
 #ユーザーの情報を取得
-user = ChatworkWrapper::CharworkUser.get_user_info token
+user = ChatworkWrapper::ChatworkUser.get_info token
 
 puts "account_id=#{puts user['account_id']}"
 puts "room_id=#{user['room_id']}"
