@@ -88,8 +88,32 @@ module ChatworkWrapper
       return sts
     end
 
-    def self.get_tasks(token,assigned_by_account_id=nil,status=nil)
+    def self.get_contacts(token)
+      contacts = {}
+      ChatworkWrapper.get('contacts','',token) {|data|
+        data.each { |d|
+          contacts[d['name']] = d
+        }
+      }
+      return contacts
+    end
+
+    def self.get_tasks(token,assigned_by_account_name=nil,status=nil)
       tasks = nil
+
+      if (assigned_by_account_name != nil)
+        contacts = get_contacts token
+        contact = contacts[assigned_by_account_name]
+        if (contact == nil)
+          #自分のIDである可能性がある
+          data = get_info token
+          if (data['name'] == assigned_by_account_name)
+            assigned_by_account_id = data['account_id']
+          end
+        else
+          assigned_by_account_id = contact['account_id']
+        end
+      end
 
       params = ''
       if (assigned_by_account_id != nil && status != nil)
