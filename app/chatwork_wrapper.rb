@@ -70,4 +70,110 @@ module ChatworkWrapper
 
   module_function :post
   module_function :get
+
+  class ChatworkUser
+    def self.get_info(token)
+      me = nil
+      ChatworkWrapper.get('me','',token) {|data|
+        me = data
+      }
+      return me
+    end
+
+    def self.get_status(token)
+      sts = nil
+      ChatworkWrapper.get('my/status','',token) {|data|
+        sts = data
+      }
+      return sts
+    end
+
+    def self.get_contacts(token)
+      contacts = {}
+      ChatworkWrapper.get('contacts','',token) {|data|
+        data.each { |d|
+          contacts[d['name']] = d
+        }
+      }
+      return contacts
+    end
+
+    def self.get_tasks(token,assigned_by_account_name=nil,status=nil)
+      tasks = nil
+
+      if (assigned_by_account_name != nil)
+        contacts = get_contacts token
+        contact = contacts[assigned_by_account_name]
+        if (contact == nil)
+          #自分のIDである可能性がある
+          data = get_info token
+          if (data['name'] == assigned_by_account_name)
+            assigned_by_account_id = data['account_id']
+          end
+        else
+          assigned_by_account_id = contact['account_id']
+        end
+      end
+
+      params = ''
+      if (assigned_by_account_id != nil && status != nil)
+        params = "assigned_by_account_id=#{assigned_by_account_id}&status=#{status}"
+      elsif (assigned_by_account_id != nil)
+        params = "assigned_by_account_id=#{assigned_by_account_id}"
+      elsif (status != nil)
+        params = "status=#{status}"
+      end
+
+      ChatworkWrapper.get('my/tasks',params,token) {|data|
+        tasks = data
+      }
+      return tasks
+    end
+  end
+
+
+  class ChatworkRoom
+    def self.get_rooms(token)
+      rooms = {};
+      ChatworkWrapper.get('rooms','',token) {|items|
+        items.each {|item|
+          name = item['name']
+          rooms[name] = item
+        }
+      }
+      return rooms
+    end
+
+    def self.get_room_members(token, room_name)
+      rooms = get_rooms(token)
+      room = rooms[room_name]
+      return nil if (room == nil)
+
+      members = {}
+      ChatworkWrapper.get("rooms/#{room['room_id']}/members",'',token) {|items|
+        items.each {|item|
+          name = item['name']
+          members[name] = item
+        }
+      }
+      return members
+    end
+
+    def self.post_message(token, room_name, message)
+      rooms = get_rooms(token)
+      room = rooms[room_name]
+      return nil if (room == nil)
+      return post_message_with_id token, room['room_id'], message
+    end
+
+    def self.post_message_with_id(token, room_id, message)
+      res = nil
+      escaped = URI.escape message
+      param =  "body=#{escaped}"
+      ChatworkWrapper.post("rooms/#{room_id}/messages",param,token) {|data|
+        res = data;
+      }
+      return res;
+    end
+  end
 end
